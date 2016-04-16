@@ -46,8 +46,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginTravelTeam"
-            android:label="@string/title_activity_login_travel_team" >
+            android:name=".LoginTravelTeam">
+            --android:label="@string/title_activity_login_travel_team" >
         </activity>
     </application>
 
