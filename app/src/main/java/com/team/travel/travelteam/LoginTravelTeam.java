@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -74,7 +75,8 @@ public class LoginTravelTeam extends Activity {
                 String password = mPasswordView.getText().toString();
                 if(user != null){
                     if(password.equals(user.getPassword())){
-                        Toast.makeText(getApplicationContext(), "Login correcto", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                        startActivity(intent);
                     } else{
                         Toast.makeText(getApplicationContext(), "User or Password are incorrect", Toast.LENGTH_LONG).show();
                     }
