@@ -9,11 +9,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    double latitud = 0;
+    double longitud = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +42,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        CameraUpdate ZoomCam = CameraUpdateFactory.zoomTo(15);
+        mMap.animateCamera(ZoomCam);
+
         try {
             mMap.setMyLocationEnabled(true);
             mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                 @Override
                 public void onMyLocationChange(Location location) {
+
+                    //consumir el servicio para guardar la posicion actual.
+                    //Consultar los demas usuarios en ruta.
+                    // graficar posicion actual y usuarios.
+
+
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
 
                     CameraUpdate cam = CameraUpdateFactory.newLatLng(new LatLng(lat, lon));
                     mMap.moveCamera(cam);
 
-                    CameraUpdate ZoomCam = CameraUpdateFactory.zoomTo(15);
-                    mMap.animateCamera(ZoomCam);
+                    mMap.clear();
+
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(lat + latitud + 0.001, lon + longitud + 0.001))
+                            .title("Andres Guataquira")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.moto_icon)));
+
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(lat + latitud + 0.002, lon + longitud + 0.002))
+                            .title("Jehison Prada")
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.moto_icon_alerta)));
+
+                    latitud =+ 0.003;
+                    longitud =+ 0.0003;
                 }
             });
         }
