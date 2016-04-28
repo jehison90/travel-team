@@ -11,11 +11,10 @@
 
     <!-- Login progress -->
     <ProgressBar android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="200dp"
-        android:layout_height="3dip"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:progressDrawable="@drawable/progress_bar"
         android:visibility="gone" />
 
         <LinearLayout android:id="@+id/email_login_form" android:layout_width="match_parent"

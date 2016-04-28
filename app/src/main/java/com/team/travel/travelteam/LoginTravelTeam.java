@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.team.travel.travelteam.data.api_interfaces.ApiClientMethods;
 import com.team.travel.travelteam.data.entities.User;
 
+import org.apache.commons.lang3.StringUtils;
+
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -43,7 +45,11 @@ public class LoginTravelTeam extends Activity {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                if(StringUtils.isNotBlank(mEmailView.getText()) && StringUtils.isNotBlank(mPasswordView.getText())){
+                    attemptLogin();
+                } else{
+                    Toast.makeText(getApplicationContext(), "Please insert user and password", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -65,8 +71,16 @@ public class LoginTravelTeam extends Activity {
         apiClientMethods.findUser(mEmailView.getText().toString(), new Callback<User>() {
             @Override
             public void success(User user, Response response) {
-                CharSequence text = "User ..." + user.getUser() + "password ..." + user.getPassword();
-                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+                String password = mPasswordView.getText().toString();
+                if(user != null){
+                    if(password.equals(user.getPassword())){
+                        Toast.makeText(getApplicationContext(), "Login correcto", Toast.LENGTH_LONG).show();
+                    } else{
+                        Toast.makeText(getApplicationContext(), "User or Password are incorrect", Toast.LENGTH_LONG).show();
+                    }
+                } else{
+                    Toast.makeText(getApplicationContext(), "User not found. Please register", Toast.LENGTH_LONG).show();
+                }
                 showProgress(false);
             }
 
