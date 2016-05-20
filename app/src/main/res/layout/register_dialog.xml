@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="50dp"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp"
+    android:paddingBottom="50dp"
+    android:background="@drawable/rounded_corners_background">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/etRegisterUser"
+        android:layout_gravity="center_horizontal"
+        android:inputType="text"
+        android:hint="@string/prompt_user"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/etRegisterPassword"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/prompt_password"
+        android:paddingTop="40dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:id="@+id/etRegisterEmail"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/prompt_email"
+        android:paddingTop="40dp"
+        android:layout_marginBottom="60dp"/>
+
+    <Button
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/action_register"
+        android:id="@+id/button"
+        android:layout_gravity="center_horizontal"
+        android:background="#1d1a1a"
+        android:textColor="#d2cece"/>
+
+</LinearLayout>

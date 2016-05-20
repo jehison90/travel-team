@@ -4,17 +4,21 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.team.travel.travelteam.data.adapter.RestAdapterHelper;
 import com.team.travel.travelteam.data.api_interfaces.ApiClientMethods;
 import com.team.travel.travelteam.data.entities.User;
 
@@ -54,7 +58,15 @@ public class LoginTravelTeam extends Activity {
             }
         });
 
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        Button mEmailRegisterButton = (Button) findViewById(R.id.email_register_button);
+        mEmailRegisterButton.setOnClickListener(new OnClickListener() {
+                                                  @Override
+                                                  public void onClick(View v) {
+                                                      register();
+                                                  }
+                                              });
+
+                mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
         mLoginFormView = findViewById(R.id.email_login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -66,21 +78,21 @@ public class LoginTravelTeam extends Activity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mLoginFormView.getWindowToken(), 0);
         showProgress(true);
-        RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(API_URL).build();
-        ApiClientMethods apiClientMethods = restAdapter.create(ApiClientMethods.class);
-        apiClientMethods.findUser(mEmailView.getText().toString(), new Callback<User>() {
+        RestAdapterHelper.getApiClientMethods().findUser(mEmailView.getText().toString(), new Callback<User>() {
             @Override
             public void success(User user, Response response) {
                 String password = mPasswordView.getText().toString();
-                if(user != null){
-                    if(password.equals(user.getPassword())){
+                if (user != null) {
+                    if (password.equals(user.getPassword())) {
                         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                         startActivity(intent);
-                    } else{
+                    } else {
                         Toast.makeText(getApplicationContext(), "User or Password are incorrect", Toast.LENGTH_LONG).show();
                     }
-                } else{
+                } else {
                     Toast.makeText(getApplicationContext(), "User not found. Please register", Toast.LENGTH_LONG).show();
                 }
                 showProgress(false);
@@ -90,6 +102,36 @@ public class LoginTravelTeam extends Activity {
             public void failure(RetrofitError error) {
                 Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                 showProgress(false);
+            }
+        });
+    }
+
+    private void register(){
+        final RegisterDialog d = new RegisterDialog(this);
+        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        d.show();
+        Button registerButton = (Button) d.findViewById(R.id.button);
+        registerButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String userName = ((EditText) d.findViewById(R.id.etRegisterUser)).getText().toString();
+                final String password = ((EditText) d.findViewById(R.id.etRegisterUser)).getText().toString();
+                final String email = ((EditText) d.findViewById(R.id.etRegisterUser)).getText().toString();
+                registerUser(new User(userName, password, email));
+            }
+        });
+    }
+
+    private void registerUser(User user){
+        RestAdapterHelper.getApiClientMethods().addUser("application/json" ,user, new Callback<User>() {
+            @Override
+            public void success(User user, Response response) {
+                System.out.println("success");
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                System.out.println("failure");
             }
         });
     }
