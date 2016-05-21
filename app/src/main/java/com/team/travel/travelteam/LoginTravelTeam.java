@@ -1,14 +1,11 @@
 package com.team.travel.travelteam;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,13 +16,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.team.travel.travelteam.data.adapter.RestAdapterHelper;
-import com.team.travel.travelteam.data.api_interfaces.ApiClientMethods;
 import com.team.travel.travelteam.data.entities.User;
 
 import org.apache.commons.lang3.StringUtils;
 
 import retrofit.Callback;
-import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
@@ -34,12 +29,11 @@ import retrofit.client.Response;
  */
 public class LoginTravelTeam extends Activity {
 
-    private static final String API_URL = "https://travel-team-api.herokuapp.com";
-
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
     private View mLoginFormView;
+
+    private ProgressDialog spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +63,6 @@ public class LoginTravelTeam extends Activity {
                 mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
         mLoginFormView = findViewById(R.id.email_login_form);
-        mProgressView = findViewById(R.id.login_progress);
     }
 
     /**
@@ -114,61 +107,69 @@ public class LoginTravelTeam extends Activity {
         registerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                showProgress(true);
                 final String userName = ((EditText) d.findViewById(R.id.etRegisterUser)).getText().toString();
-                final String password = ((EditText) d.findViewById(R.id.etRegisterUser)).getText().toString();
-                final String email = ((EditText) d.findViewById(R.id.etRegisterUser)).getText().toString();
+                final String password = ((EditText) d.findViewById(R.id.etRegisterPassword)).getText().toString();
+                final String email = ((EditText) d.findViewById(R.id.etRegisterEmail)).getText().toString();
                 registerUser(new User(userName, password, email));
             }
         });
     }
 
-    private void registerUser(User user){
-        RestAdapterHelper.getApiClientMethods().addUser("application/json" ,user, new Callback<User>() {
-            @Override
-            public void success(User user, Response response) {
-                System.out.println("success");
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                System.out.println("failure");
-            }
-        });
+    private void registerUser(final User userToRegister){
+        RestAdapterHelper.getApiClientMethods().findUser(userToRegister.getUser(), new CallBackRegisterUser(userToRegister));
     }
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
+        if(spinner == null){
+            spinner = new ProgressDialog(this, R.style.spinnerDialog);
+            spinner.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            spinner.setMessage("Loading ...");
+            spinner.setCancelable(false);
+        }
 
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        if(show){
+            spinner.show();
+        } else{
+            spinner.dismiss();
+        }
+    }
+
+    private class CallBackRegisterUser implements Callback<User>{
+
+        User userToRegister;
+
+        public CallBackRegisterUser(User userToRegister) {
+            this.userToRegister = userToRegister;
+        }
+
+        @Override
+        public void success(User user, Response response) {
+            if (user == null) {
+                RestAdapterHelper.getApiClientMethods().addUser(userToRegister, new Callback<User>() {
+                    @Override
+                    public void success(User user, Response response) {
+                        showProgress(false);
+                        Toast.makeText(getApplicationContext(), "User registered successfully", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        showProgress(false);
+                        Toast.makeText(getApplicationContext(), "Error registering user " + error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            } else {
+                Toast.makeText(getApplicationContext(), "User already registered. Sing in or use another user name", Toast.LENGTH_LONG).show();
+            }
+            showProgress(false);
+        }
+
+        @Override
+        public void failure(RetrofitError error) {
+            Toast.makeText(getApplicationContext(), "Error registering user " + error.getMessage(), Toast.LENGTH_LONG).show();
+            showProgress(false);
         }
     }
 

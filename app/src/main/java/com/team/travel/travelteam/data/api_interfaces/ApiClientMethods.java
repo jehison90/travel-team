@@ -25,6 +25,6 @@ public interface ApiClientMethods {
     void findActiveUsersByRouteId(@Path("routeId") Integer routeId, Callback<List> positions);
 
     @POST("/user/add")
-    void addUser(@Header("Content-Type") String content_type, @Body User user, Callback<User> cb);
+    void addUser(@Body User user, Callback<User> cb);
 
 }
