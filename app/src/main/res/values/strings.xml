@@ -17,4 +17,14 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+
+    <!-- Strings related to route creation -->
+    <string name="create_route_button">Create</string>
+    <string name="prompt_initial_place">Initial Place</string>
+    <string name="prompt_final_place">Final Place</string>
+
+    <!-- Strings related to join a route -->
+    <string name="join_route_button">Join</string>
+    <string name="prompt_route_id">Route id</string>
+
 </resources>

@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.team.travel.travelteam.data.adapter.RestAdapterHelper;
 import com.team.travel.travelteam.data.entities.User;
+import com.team.travel.travelteam.dialogs.RegisterDialog;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -100,17 +101,17 @@ public class LoginTravelTeam extends Activity {
     }
 
     private void register(){
-        final RegisterDialog d = new RegisterDialog(this);
-        d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        d.show();
-        Button registerButton = (Button) d.findViewById(R.id.button);
+        final RegisterDialog registerDialog = new RegisterDialog(this);
+        registerDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        registerDialog.show();
+        Button registerButton = (Button) registerDialog.findViewById(R.id.button);
         registerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 showProgress(true);
-                final String userName = ((EditText) d.findViewById(R.id.etRegisterUser)).getText().toString();
-                final String password = ((EditText) d.findViewById(R.id.etRegisterPassword)).getText().toString();
-                final String email = ((EditText) d.findViewById(R.id.etRegisterEmail)).getText().toString();
+                final String userName = ((EditText) registerDialog.findViewById(R.id.etRegisterUser)).getText().toString();
+                final String password = ((EditText) registerDialog.findViewById(R.id.etRegisterPassword)).getText().toString();
+                final String email = ((EditText) registerDialog.findViewById(R.id.etRegisterEmail)).getText().toString();
                 registerUser(new User(userName, password, email));
             }
         });

@@ -5,23 +5,40 @@
     android:layout_height="match_parent" android:id="@+id/map" tools:context=".MapsActivity"
     android:name="com.google.android.gms.maps.SupportMapFragment">
 
-    <android.support.design.widget.CoordinatorLayout
-        android:id="@+id/main_content"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/rl_floating_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right">
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_add_route"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_margin="16dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginRight="6dp"
             android:src="@drawable/add_route"
             app:backgroundTint="@android:color/holo_red_light"
-            app:layout_anchorGravity="bottom|right|end"
             android:focusable="true"
             android:clickable="true"
-            android:contextClickable="true"/>
+            android:contextClickable="true"
+            />
 
-    </android.support.design.widget.CoordinatorLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_join_route"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginRight="6dp"
+            android:src="@drawable/join_route"
+            app:backgroundTint="@android:color/holo_red_light"
+            android:focusable="true"
+            android:clickable="true"
+            android:contextClickable="true"
+            android:layout_below="@+id/fab_add_route"
+            />
+
+    </RelativeLayout>
 
 </fragment>

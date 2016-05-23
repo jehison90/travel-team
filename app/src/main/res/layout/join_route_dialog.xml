@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="50dp"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp"
+    android:paddingBottom="50dp"
+    android:background="@drawable/rounded_corners_background">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/etRouteId"
+        android:layout_gravity="center_horizontal"
+        android:inputType="text"
+        android:hint="@string/prompt_route_id"
+        />
+
+    <Button
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/join_route_button"
+        android:id="@+id/createRoute"
+        android:layout_gravity="center_horizontal"
+        android:background="#1d1a1a"
+        android:textColor="#d2cece"/>
+
+</LinearLayout>
