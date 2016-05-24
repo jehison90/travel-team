@@ -35,6 +35,7 @@
         android:id="@+id/createRoute"
         android:layout_gravity="center_horizontal"
         android:background="#1d1a1a"
-        android:textColor="#d2cece"/>
+        android:textColor="#d2cece"
+        android:clickable="true"/>
 
 </LinearLayout>

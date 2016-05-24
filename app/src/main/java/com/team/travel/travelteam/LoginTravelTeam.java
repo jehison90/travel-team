@@ -1,7 +1,6 @@
 package com.team.travel.travelteam;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 
 import com.team.travel.travelteam.data.adapter.RestAdapterHelper;
 import com.team.travel.travelteam.data.entities.User;
+import com.team.travel.travelteam.dialogs.ProgressDialogUtility;
 import com.team.travel.travelteam.dialogs.RegisterDialog;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,8 +33,6 @@ public class LoginTravelTeam extends Activity {
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mLoginFormView;
-
-    private ProgressDialog spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +59,11 @@ public class LoginTravelTeam extends Activity {
                                                   }
                                               });
 
-                mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
         mLoginFormView = findViewById(R.id.email_login_form);
+
+        ProgressDialogUtility.setContext(this);
     }
 
     /**
@@ -74,7 +74,7 @@ public class LoginTravelTeam extends Activity {
     private void attemptLogin() {
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(mLoginFormView.getWindowToken(), 0);
-        showProgress(true);
+        ProgressDialogUtility.showProgressDialog();
         RestAdapterHelper.getApiClientMethods().findUser(mEmailView.getText().toString(), new Callback<User>() {
             @Override
             public void success(User user, Response response) {
@@ -82,6 +82,7 @@ public class LoginTravelTeam extends Activity {
                 if (user != null) {
                     if (password.equals(user.getPassword())) {
                         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                        intent.putExtra(MapsActivity.LOGGED_USER_KEY, user);
                         startActivity(intent);
                     } else {
                         Toast.makeText(getApplicationContext(), "User or Password are incorrect", Toast.LENGTH_LONG).show();
@@ -89,13 +90,13 @@ public class LoginTravelTeam extends Activity {
                 } else {
                     Toast.makeText(getApplicationContext(), "User not found. Please register", Toast.LENGTH_LONG).show();
                 }
-                showProgress(false);
+                ProgressDialogUtility.dismissProgressDialog();
             }
 
             @Override
             public void failure(RetrofitError error) {
                 Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-                showProgress(false);
+                ProgressDialogUtility.dismissProgressDialog();
             }
         });
     }
@@ -108,41 +109,27 @@ public class LoginTravelTeam extends Activity {
         registerButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                showProgress(true);
+                ProgressDialogUtility.showProgressDialog();
                 final String userName = ((EditText) registerDialog.findViewById(R.id.etRegisterUser)).getText().toString();
                 final String password = ((EditText) registerDialog.findViewById(R.id.etRegisterPassword)).getText().toString();
                 final String email = ((EditText) registerDialog.findViewById(R.id.etRegisterEmail)).getText().toString();
-                registerUser(new User(userName, password, email));
+                registerUser(new User(userName, password, email), registerDialog);
             }
         });
     }
 
-    private void registerUser(final User userToRegister){
-        RestAdapterHelper.getApiClientMethods().findUser(userToRegister.getUser(), new CallBackRegisterUser(userToRegister));
-    }
-
-    private void showProgress(final boolean show) {
-
-        if(spinner == null){
-            spinner = new ProgressDialog(this, R.style.spinnerDialog);
-            spinner.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            spinner.setMessage("Loading ...");
-            spinner.setCancelable(false);
-        }
-
-        if(show){
-            spinner.show();
-        } else{
-            spinner.dismiss();
-        }
+    private void registerUser(final User userToRegister, final RegisterDialog dialog){
+        RestAdapterHelper.getApiClientMethods().findUser(userToRegister.getUser(), new CallBackRegisterUser(userToRegister, dialog));
     }
 
     private class CallBackRegisterUser implements Callback<User>{
 
         User userToRegister;
+        RegisterDialog parentView;
 
-        public CallBackRegisterUser(User userToRegister) {
+        public CallBackRegisterUser(User userToRegister, RegisterDialog parentView) {
             this.userToRegister = userToRegister;
+            this.parentView = parentView;
         }
 
         @Override
@@ -151,26 +138,27 @@ public class LoginTravelTeam extends Activity {
                 RestAdapterHelper.getApiClientMethods().addUser(userToRegister, new Callback<User>() {
                     @Override
                     public void success(User user, Response response) {
-                        showProgress(false);
+                        ProgressDialogUtility.dismissProgressDialog();
                         Toast.makeText(getApplicationContext(), "User registered successfully", Toast.LENGTH_LONG).show();
+                        parentView.dismiss();
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        showProgress(false);
+                        ProgressDialogUtility.dismissProgressDialog();
                         Toast.makeText(getApplicationContext(), "Error registering user " + error.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
             } else {
                 Toast.makeText(getApplicationContext(), "User already registered. Sing in or use another user name", Toast.LENGTH_LONG).show();
             }
-            showProgress(false);
+            ProgressDialogUtility.dismissProgressDialog();
         }
 
         @Override
         public void failure(RetrofitError error) {
             Toast.makeText(getApplicationContext(), "Error registering user " + error.getMessage(), Toast.LENGTH_LONG).show();
-            showProgress(false);
+            ProgressDialogUtility.dismissProgressDialog();
         }
     }
 

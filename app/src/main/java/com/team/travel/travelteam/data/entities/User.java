@@ -1,6 +1,8 @@
 package com.team.travel.travelteam.data.entities;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private String user;
 

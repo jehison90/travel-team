@@ -1,5 +1,7 @@
 package com.team.travel.travelteam.data.api_interfaces;
 
+import com.team.travel.travelteam.data.entities.Position;
+import com.team.travel.travelteam.data.entities.Route;
 import com.team.travel.travelteam.data.entities.User;
 
 import java.util.List;
@@ -21,10 +23,19 @@ public interface ApiClientMethods {
     @GET("/user/{userName}")
     void findUser(@Path("userName") String userName, Callback<User> cb);
 
+    @GET("/route/{routeId}")
+    void findRoute(@Path("routeId") Integer routeId, Callback<Route> cb);
+
     @GET("/position/{routeId}")
-    void findActiveUsersByRouteId(@Path("routeId") Integer routeId, Callback<List> positions);
+    void findActiveUsersByRouteId(@Path("routeId") Integer routeId, Callback<List<Position>> positions);
 
     @POST("/user/add")
     void addUser(@Body User user, Callback<User> cb);
+
+    @POST("/route/add")
+    void addRoute(@Body Route route, Callback<Route> cb);
+
+    @POST("/position/add")
+    void addPosition(@Body Position position, Callback<Position> cb);
 
 }

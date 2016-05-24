@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/etRouteId"
         android:layout_gravity="center_horizontal"
-        android:inputType="text"
+        android:inputType="number"
         android:hint="@string/prompt_route_id"
         />
 
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/join_route_button"
-        android:id="@+id/createRoute"
+        android:id="@+id/joinRouteButton"
         android:layout_gravity="center_horizontal"
         android:background="#1d1a1a"
         android:textColor="#d2cece"/>
