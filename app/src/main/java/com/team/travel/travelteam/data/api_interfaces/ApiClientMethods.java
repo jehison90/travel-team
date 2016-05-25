@@ -38,4 +38,7 @@ public interface ApiClientMethods {
     @POST("/position/add")
     void addPosition(@Body Position position, Callback<Position> cb);
 
+    @GET("/position/user/{userName}")
+    void findUserActiveRoute(@Path("userName") String userName, Callback<Route> cb);
+
 }

@@ -19,6 +19,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.team.travel.travelteam.data.adapter.RestAdapterHelper;
 import com.team.travel.travelteam.data.entities.Position;
@@ -29,6 +31,7 @@ import com.team.travel.travelteam.dialogs.CreateRouteDialog;
 import com.team.travel.travelteam.dialogs.JoinRouteDialog;
 import com.team.travel.travelteam.dialogs.ProgressDialogUtility;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +46,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double longitud = 0;
 
     public final static String LOGGED_USER_KEY = "loggedUser";
-    private User loggerUser = null;
+    private User loggedUser = null;
 
     private FloatingActionButton fabAddRoute;
     private FloatingActionButton fabJoinRoute;
@@ -78,7 +81,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        loggerUser = (User) getIntent().getExtras().getSerializable(LOGGED_USER_KEY);
+        loggedUser = (User) getIntent().getExtras().getSerializable(LOGGED_USER_KEY);
+
+        RestAdapterHelper.getApiClientMethods().findUserActiveRoute(loggedUser.getUser(), new Callback<Route>() {
+            @Override
+            public void success(Route route, Response response) {
+                if(route != null){
+                    actualRoute = route;
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+
+            }
+        });
 
         //Forcing reinitialization of loading Dialog
         ProgressDialogUtility.setContext(this);
@@ -159,8 +176,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        CameraUpdate ZoomCam = CameraUpdateFactory.zoomTo(15);
-        mMap.animateCamera(ZoomCam);
 
         try {
             mMap.setMyLocationEnabled(true);
@@ -177,9 +192,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     longitud = location.getLongitude();
 
                     saveOrUpdatePosition();
-
-                    CameraUpdate cam = CameraUpdateFactory.newLatLng(new LatLng(latitud, longitud));
-                    mMap.moveCamera(cam);
 
                     mMap.clear();
 
@@ -210,33 +222,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void DrawPositionByUser() {
         if(usersInRoute != null && !usersInRoute.isEmpty()){
+            List<Marker> markers = new ArrayList<Marker>();
             for (Position item : usersInRoute) {
+                Marker marker;
                 if(item.isNormalPosition()) {
-                    mMap.addMarker(new MarkerOptions()
+                    marker = mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(item.getLastX(), item.getLastY()))
                             .title(item.getUser().getUser())
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.moto_icon)));
                 }
                 else {
-                    mMap.addMarker(new MarkerOptions()
+                    marker = mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(item.getLastX(), item.getLastY()))
                             .title(item.getUser().getUser())
                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.moto_icon_alerta)));
                 }
+                markers.add(marker);
             }
+
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (Marker marker : markers) {
+                builder.include(marker.getPosition());
+            }
+            LatLngBounds bounds = builder.build();
+
+            int padding = 0; // offset from edges of the map in pixels
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            mMap.animateCamera(cu);
         }
+
     }
 
     private void saveOrUpdatePosition(){
-        if(actualRoute != null && loggerUser != null){
+        if(actualRoute != null && loggedUser != null){
             Position position = new Position();
 
             PositionPk positionPk = new PositionPk();
             positionPk.setRouteId(actualRoute.getId());
-            positionPk.setUserName(loggerUser.getUser());
+            positionPk.setUserName(loggedUser.getUser());
             position.setPositionPk(positionPk);
 
-            position.setUser(loggerUser);
+            position.setUser(loggedUser);
             position.setRoute(actualRoute);
 
             position.setActive(true);
