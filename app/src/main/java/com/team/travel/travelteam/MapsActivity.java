@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -63,6 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         tvRouteId = (TextView) findViewById(R.id.tvRouteId);
+        tvRouteId.setVisibility(View.INVISIBLE);
 
         fabAddRoute = (FloatingActionButton) findViewById(R.id.fab_add_route);
         fabJoinRoute = (FloatingActionButton) findViewById(R.id.fab_join_route);
@@ -86,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         RestAdapterHelper.getApiClientMethods().findUserActiveRoute(loggedUser.getUser(), new Callback<Route>() {
             @Override
             public void success(Route route, Response response) {
-                if(route != null){
+                if (route != null) {
                     actualRoute = route;
                 }
             }
@@ -131,10 +133,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void success(Route route, Response response) {
                 actualRoute = route;
-                tvRouteId.setText("In Route " + actualRoute.getId());
-                tvRouteId.setVisibility(View.VISIBLE);
 
                 saveOrUpdatePosition();
+                DrawPositionByUser();
 
                 ProgressDialogUtility.dismissProgressDialog();
                 parentView.dismiss();
@@ -199,6 +200,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         RestAdapterHelper.getApiClientMethods().findActiveUsersByRouteId(actualRoute.getId(), new Callback<List<Position>>() {
                             @Override
                             public void success(List<Position> positions, Response response) {
+                                usersInRoute = null;
                                 usersInRoute = positions;
                             }
 
@@ -224,6 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(usersInRoute != null && !usersInRoute.isEmpty()){
             List<Marker> markers = new ArrayList<Marker>();
             for (Position item : usersInRoute) {
+                Log.e("positions in route "+ actualRoute.getId(), item.getLastX() + "," + item.getLastY());
                 Marker marker;
                 if(item.isNormalPosition()) {
                     marker = mMap.addMarker(new MarkerOptions()
@@ -246,9 +249,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             LatLngBounds bounds = builder.build();
 
-            int padding = 0; // offset from edges of the map in pixels
+            int padding = 100; // offset from edges of the map in pixels
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
             mMap.animateCamera(cu);
+
+            if(actualRoute != null){
+                tvRouteId.setText("In Route " + actualRoute.getId());
+                tvRouteId.setVisibility(View.VISIBLE);
+            } else{
+                tvRouteId.setVisibility(View.INVISIBLE);
+            }
+
         }
 
     }
@@ -302,6 +313,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if(route != null){
                 actualRoute = route;
                 saveOrUpdatePosition();
+                DrawPositionByUser();
                 ProgressDialogUtility.dismissProgressDialog();
                 parentView.dismiss();
             } else{

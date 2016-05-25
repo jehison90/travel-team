@@ -48,8 +48,8 @@
         android:backgroundTint="@android:color/transparent"
         android:textColor="#daac56"
         android:background="#1d1a1a"
-        android:paddingBottom="6dp"
-        android:layout_gravity="bottom|left"
-        android:visibility="gone"/>
+        android:textStyle="bold"
+        android:paddingBottom="35dp"
+        android:layout_gravity="bottom|left"/>
 
 </fragment>
